@@ -4,6 +4,7 @@ import mediapipe as mp
 import numpy as np
 from keys import PressKey, ReleaseKey, W,S,A,D
 from HandTracking import HandDetector
+from helper import Helper
 
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
@@ -12,6 +13,8 @@ scale_number = 1
 cam0 = cv.VideoCapture(0)
 
 detector = HandDetector(cam0)
+helper = Helper()
+wanted_positions = [0,5,17]
 
 with mp_hands.Hands(
     min_detection_confidence = 0.5,
@@ -26,8 +29,8 @@ with mp_hands.Hands(
 
         """ Processing of hand """
         frame = detector.process_hands(frame)
-        hands_list = detector.find_positions()
-
+        hands_list = detector.find_positions(wanted_positions)
+        helper.draw_steering_wheel(frame, hands_list)
         """ End of processing """
 
 

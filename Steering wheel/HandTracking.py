@@ -32,14 +32,19 @@ class HandDetector:
                     self.mp_drawing.draw_landmarks(frame, hand_lm, self.mp_hands.HAND_CONNECTIONS)
         return frame
 
-    def find_positions(self):
-        lm_list = []
+    def find_positions(self, positions = []):
+        lm_list_1 = []
+        lm_list_2 = []
+        combined_list = [lm_list_1, lm_list_2]
         if self.result.multi_hand_landmarks:
-            for hand in self.result.multi_hand_landmarks:
+            for hand_id, hand in enumerate(self.result.multi_hand_landmarks):
                 for id, lm in enumerate(hand.landmark):
-                    lm_list.append([id, int(lm.x * self.width), int(lm.y * self.height)])
-
-        return lm_list
+                    try:
+                        if id in positions and hand_id <= 1:
+                            combined_list[hand_id].append([int(lm.x * self.width), int(lm.y * self.height)])
+                    except:
+                        pass
+        return combined_list
 
 if __name__ == "__main__":
     cam0 = cv.VideoCapture(0)
