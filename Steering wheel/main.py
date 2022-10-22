@@ -2,12 +2,16 @@ import cv2 as cv
 from time import time
 import mediapipe as mp
 import numpy as np
+from keys import PressKey, ReleaseKey, W,S,A,D
+from HandTracking import HandDetector
 
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 
 scale_number = 1
 cam0 = cv.VideoCapture(0)
+
+detector = HandDetector(cam0)
 
 with mp_hands.Hands(
     min_detection_confidence = 0.5,
@@ -18,16 +22,16 @@ with mp_hands.Hands(
         _, frame = cam0.read()
         if scale_number != 1:
             frame = cv.resize(frame, (int(frame.shape[1] // scale_number), int(frame.shape[0] // scale_number)))
+        
 
         """ Processing of hand """
-        results = hands.process(frame)
-        if results.multi_hand_landmarks:
-            for hand_lm in results.multi_hand_landmarks:
-                mp_drawing.draw_landmarks(frame, hand_lm, mp_hands.HAND_CONNECTIONS)
+        frame = detector.process_hands(frame)
+        hands_list = detector.find_positions()
+
         """ End of processing """
 
 
-        # FPS Handling
+        """ FPS Handling """
         end = time()
         total_time = end - start
         if total_time != 0:
@@ -37,6 +41,8 @@ with mp_hands.Hands(
         else:
             print(f"FPS: ???")
             cv.putText(frame, f"FPS: ???", (20,70), cv.FONT_HERSHEY_PLAIN, 2, (255,0,255), 2, 1)
+        """ End of FPS Handling"""
+
 
         cv.imshow(f"1{cam0}", frame)
 
