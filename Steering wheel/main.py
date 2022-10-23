@@ -1,7 +1,6 @@
 import cv2 as cv
 from time import time
 import mediapipe as mp
-import numpy as np
 from HandTracking import HandDetector
 from helper import Helper
 

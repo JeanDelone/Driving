@@ -10,6 +10,7 @@ class Helper:
         self.steering_number = 100
     
     def countdown(self, t):
+        print("\n")
         while t:
             mins, secs = divmod(t, 60)
             timer = '{:02d}:{:02d}'.format(mins, secs)
@@ -31,22 +32,49 @@ class Helper:
         if len(self.middle_of_hands[0]) != 0 and len(self.middle_of_hands[1]) != 0:
             y1 = self.middle_of_hands[0][1]
             y2 = self.middle_of_hands[1][1]
+            x1 = self.middle_of_hands[0][0]
+            x2 = self.middle_of_hands[1][0]
             if (y1 - y2) >= self.steering_number:
+                if x1 - x2 > 0:
                 # ReleaseKey(W)
                 # ReleaseKey(D)
                 # PressKey(A)
-                print("steering right")
-            elif int(y1 - y2) <= -self.steering_number:
-                # ReleaseKey(W)
-                # ReleaseKey(A)
-                # PressKey(D)
-                print("steering left")
+                    print("steering left")
+                    ReleaseKey(S)
+                    ReleaseKey(W)
+                    ReleaseKey(D)
+                    PressKey(A)
+                else:
+                    print("steering right")
+                    ReleaseKey(S)
+                    ReleaseKey(W)
+                    ReleaseKey(A)
+                    PressKey(D)
+            elif int(y1 - y2) <= - self.steering_number:
+                if x1 - x2 < 0:
+                    print("steering left")
+                    ReleaseKey(S)
+                    ReleaseKey(W)
+                    ReleaseKey(D)
+                    PressKey(A)
+                else:
+                    print("steering right")
+                    ReleaseKey(S)
+                    ReleaseKey(W)
+                    ReleaseKey(A)
+                    PressKey(D)
             else:
-                # ReleaseKey(A)
-                # ReleaseKey(D)
-                # PressKey(W)
+                ReleaseKey(S)
+                ReleaseKey(A)
+                ReleaseKey(D)
+                PressKey(W)
                 print("going forward")
-                
+        else:
+            ReleaseKey(W)
+            ReleaseKey(A)
+            ReleaseKey(D)
+            PressKey(S)
+            print("backing")
             # print(y_distance)
             # if y_distance <= 100:
             #     PressKey(W)
