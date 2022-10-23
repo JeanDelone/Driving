@@ -46,6 +46,8 @@ class HandDetector:
                         pass
         return combined_list
 
+        
+
 if __name__ == "__main__":
     cam0 = cv.VideoCapture(0)
 
