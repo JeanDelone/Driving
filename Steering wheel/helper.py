@@ -2,12 +2,21 @@ from time import sleep
 import cv2 as cv
 import math
 from keys import PressKey, ReleaseKey, W,S,A,D
+import vgamepad as vg
+
+
 
 class Helper:
 
     def __init__(self):
         self.middle_of_hands = [[],[]]
-        self.steering_number = 100
+        self.steering_number = 50
+        self.max_steering_number = 240
+        self.primary_wheel_color = (30,30,30)
+        self.secondary_wheel_color = (72,72,72)
+        self.WHITE = (255,255,255)
+        self.PINK = (255,0,255)
+        self.gamepad = vg.VX360Gamepad()
     
     def countdown(self, t):
         print("\n")
@@ -34,58 +43,74 @@ class Helper:
             y2 = self.middle_of_hands[1][1]
             x1 = self.middle_of_hands[0][0]
             x2 = self.middle_of_hands[1][0]
-            if (y1 - y2) >= self.steering_number:
-                if x1 - x2 > 0:
-                # ReleaseKey(W)
-                # ReleaseKey(D)
-                # PressKey(A)
-                    print("steering left")
-                    ReleaseKey(S)
-                    ReleaseKey(W)
-                    ReleaseKey(D)
-                    PressKey(A)
+            y1y2 = y1 - y2
+            if (y1y2) >= self.steering_number:
+                if y1y2 >= self.max_steering_number:
+                    steer_value = 32767
+                    if x1 - x2 > 0:
+                        print("steering left")
+                        self.gamepad.reset()
+                        self.gamepad.left_joystick(-steer_value, 0)
+                        self.gamepad.update()
+                    else:
+                        print("steering right")
+                        self.gamepad.reset()
+                        self.gamepad.left_joystick(steer_value, 0)
+                        self.gamepad.update()
+                # print(f"a: {steer_value}")
                 else:
-                    print("steering right")
-                    ReleaseKey(S)
-                    ReleaseKey(W)
-                    ReleaseKey(A)
-                    PressKey(D)
-            elif int(y1 - y2) <= - self.steering_number:
-                if x1 - x2 < 0:
-                    print("steering left")
-                    ReleaseKey(S)
-                    ReleaseKey(W)
-                    ReleaseKey(D)
-                    PressKey(A)
+                    steer_value = int(32676 * ((y1y2)/self.max_steering_number))
+                    if x1 - x2 > 0:
+                        print("steering left")
+                        self.gamepad.reset()
+                        self.gamepad.right_trigger(value=111)  # value between 0 and 255
+                        self.gamepad.left_joystick(-steer_value, 0)
+                        self.gamepad.update()
+                    else:
+                        print("steering right")
+                        self.gamepad.reset()
+                        self.gamepad.right_trigger(value=111)  # value between 0 and 255
+                        self.gamepad.left_joystick(steer_value, 0)
+                        self.gamepad.update()
+            elif (y1y2) <= - self.steering_number:
+                if y1y2 >= self.max_steering_number:
+                    steer_value = 32767
+                    if x1 - x2 > 0:
+                        print("steering left")
+                        self.gamepad.reset()
+                        self.gamepad.left_joystick(-steer_value, 0)
+                        self.gamepad.update()
+                    else:
+                        print("steering right")
+                        self.gamepad.reset()
+                        self.gamepad.left_joystick(steer_value, 0)
+                        self.gamepad.update()
+                # print(f"a: {steer_value}")
                 else:
-                    print("steering right")
-                    ReleaseKey(S)
-                    ReleaseKey(W)
-                    ReleaseKey(A)
-                    PressKey(D)
+                    steer_value = int(32676 * ((y1y2)/self.max_steering_number))
+                    if x1 - x2 > 0:
+                        print("steering left")
+                        self.gamepad.reset()
+                        self.gamepad.right_trigger(value=111)  # value between 0 and 255
+                        self.gamepad.left_joystick(-steer_value, 0)
+                        self.gamepad.update()
+                    else:
+                        print("steering right")
+                        self.gamepad.reset()
+                        self.gamepad.right_trigger(value=111)  # value between 0 and 255
+                        self.gamepad.left_joystick(steer_value, 0)
+                        self.gamepad.update()
             else:
-                ReleaseKey(S)
-                ReleaseKey(A)
-                ReleaseKey(D)
-                PressKey(W)
+                self.gamepad.reset()
+                self.gamepad.right_trigger(value=255)  # value between 0 and 255
+                self.gamepad.update()
                 print("going forward")
         else:
-            ReleaseKey(W)
-            ReleaseKey(A)
-            ReleaseKey(D)
-            PressKey(S)
+            # ReleaseKey(W)
+            # ReleaseKey(A)
+            # ReleaseKey(D)
+            # PressKey(S)
             print("backing")
-            # print(y_distance)
-            # if y_distance <= 100:
-            #     PressKey(W)
-            #     print("going forward")
-            # elif y_distance > 100:
-            #     if hands[0][1] >= hands[1][1]:
-            #         PressKey(A)
-            #         print("steering left")
-            #     else:
-            #         print("steering right")
-            #         PressKey(D)
 
 
     def __midpoint(self, p1, p2):
@@ -106,15 +131,19 @@ class Helper:
                 sumy = 0
             self.middle_of_hands = hands_middle
 
-    def __third_point_on_circle(self, hands, midpoint):
+    def __third_point_on_circle(self, hands, midpoint, lower = True):
         points_relative = [[hands[0][0] - midpoint[0], hands[0][1] - midpoint[1]], [hands[1][0] - midpoint[0], hands[1][1] - midpoint[1]]]
 
         midpoint_points_relative = [[points_relative[0][1], - points_relative[0][0]], [points_relative[1][1], - points_relative[1][0]]]
         midpoint_points = [[midpoint_points_relative[0][0] + midpoint[0], midpoint_points_relative[0][1] + midpoint[1]], [midpoint_points_relative[1][0] + midpoint[0], midpoint_points_relative[1][1] + midpoint[1]]]
         if midpoint_points[0][1] >= midpoint_points[1][1]:
-            return midpoint_points[0]
-        else:
+            if lower:
+                return midpoint_points[0]
             return midpoint_points[1]
+        else:
+            if lower:
+                return midpoint_points[1]
+            return midpoint_points[0]
     
     def __steering_wheel_radius(self, hands):
         if hands != None:
@@ -135,18 +164,18 @@ class Helper:
                 third_point = self.__third_point_on_circle(self.middle_of_hands, middle_of_steering_wheel)
                 
                 # Drawing outside circle and middle line
-                cv.circle(frame, middle_of_steering_wheel, wheel_radius, (192,192,192), 21)
-                cv.line(frame, self.middle_of_hands[0], self.middle_of_hands[1], (192,192,192), 21)
-                cv.line(frame, middle_of_steering_wheel, third_point, (192,192,192), 21)
-                cv.line(frame, middle_of_steering_wheel, third_point, (0,0,0), 16)
-                cv.circle(frame, middle_of_steering_wheel, wheel_radius, (0,0,0), 16)
-                cv.line(frame, self.middle_of_hands[0], self.middle_of_hands[1], (0,0,0), 16)
+                cv.circle(frame, middle_of_steering_wheel, wheel_radius, self.secondary_wheel_color, 21)
+                cv.line(frame, self.middle_of_hands[0], self.middle_of_hands[1], self.secondary_wheel_color, 21)
+                cv.line(frame, middle_of_steering_wheel, third_point, self.secondary_wheel_color, 21)
+                cv.line(frame, middle_of_steering_wheel, third_point, self.primary_wheel_color, 16)
+                cv.circle(frame, middle_of_steering_wheel, wheel_radius, self.primary_wheel_color, 16)
+                cv.line(frame, self.middle_of_hands[0], self.middle_of_hands[1], self.primary_wheel_color, 16)
 
-                # Drawing half-line from middle to bottom
 
 
                 # drawing car logo
-                cv.circle(frame, middle_of_steering_wheel, 50, (0,0,0), -1)
-                cv.circle(frame, middle_of_steering_wheel, 43, (192,192,192), 2)
+                cv.circle(frame, middle_of_steering_wheel, 50, self.primary_wheel_color, -1)
+                cv.circle(frame, middle_of_steering_wheel, 43, self.secondary_wheel_color, 2)
+                # cv.line(frame, middle_of_steering_wheel, )
             except:
                 print("CIRCLE DRAWING ERROR")

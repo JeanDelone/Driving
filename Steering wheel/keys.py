@@ -1,5 +1,8 @@
 import ctypes
 import time
+import vgamepad as vg
+
+gamepad = vg.VX360Gamepad()
 
 SendInput = ctypes.windll.user32.SendInput
 
