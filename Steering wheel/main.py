@@ -7,12 +7,15 @@ from helper import Helper
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 
+# Number used to scale webcam. Higher number = smaller camera
 scale_number = 1
 cam0 = cv.VideoCapture(0)
 
 detector = HandDetector(cam0)
 helper = Helper()
-wanted_positions = [0,5,17]
+
+# List of landmarks id, to determine middle of hand https://google.github.io/mediapipe/solutions/hands.html
+wanted_landmarks = [0,5,17]
 
 helper.countdown(3)
 
@@ -28,13 +31,13 @@ with mp_hands.Hands(
 
         """ Processing of hand """
         frame = detector.process_hands(frame)
-        hands_list = detector.find_positions(wanted_positions)
+        hands_list = detector.find_positions(wanted_landmarks)
         helper.draw_steering_wheel(frame, hands_list)
         helper.steering()
         """ End of processing """
 
 
-        # """ FPS Handling """
+        """ FPS Handling """
         # end = time()
         # total_time = end - start
         # if total_time != 0:
@@ -44,7 +47,7 @@ with mp_hands.Hands(
         # else:
         #     print(f"FPS: ???")
         #     cv.putText(frame, f"FPS: ???", (20,70), cv.FONT_HERSHEY_PLAIN, 2, (255,0,255), 2, 1)
-        # """ End of FPS Handling"""
+        """ End of FPS Handling"""
 
 
         cv.imshow(f"1{cam0}", frame)
