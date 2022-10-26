@@ -17,7 +17,8 @@ helper = Helper()
 # List of landmarks id, to determine middle of hand https://google.github.io/mediapipe/solutions/hands.html
 wanted_landmarks = [0,5,17]
 
-helper.countdown(3)
+helper.countdown(1)
+
 
 with mp_hands.Hands(
     min_detection_confidence = 0.5,
